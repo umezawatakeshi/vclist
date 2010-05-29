@@ -12,6 +12,17 @@
 const char szTitle[] = "Video Codec List";
 const char szWindowClass[] = "VCLIST";
 
+struct ARCHINFO
+{
+	char szName[16];
+	UINT uIDBase;
+};
+
+const ARCHINFO arch_x86 = { "x86", IDC_ARCHITECTURE_BASE_X86 };
+const ARCHINFO arch_x64 = { "x64", IDC_ARCHITECTURE_BASE_X64 };
+
+const ARCHINFO *archinfo[3];
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 HWND hWndMain;
@@ -23,6 +34,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	WNDCLASSEX wcex;
 	HACCEL hAccel;
 	MSG msg;
+	SYSTEM_INFO si;
+
+	GetNativeSystemInfo(&si);
+	switch(si.wProcessorArchitecture)
+	{
+	case PROCESSOR_ARCHITECTURE_INTEL:
+	default:
+		archinfo[0] = &arch_x86;
+		archinfo[1] = NULL;
+		break;
+	case PROCESSOR_ARCHITECTURE_AMD64:
+		archinfo[0] = &arch_x86;
+		archinfo[1] = &arch_x64;
+		archinfo[2] = NULL;
+		break;
+	}
 
 	wcex.cbSize        = sizeof(WNDCLASSEX);
 	wcex.style         = CS_HREDRAW | CS_VREDRAW;
@@ -76,19 +103,82 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(hWndTabArch, WM_SETFONT, (WPARAM) GetStockObject(ANSI_VAR_FONT), TRUE);
 
 			memset(&item, 0, sizeof(item));
-			item.mask = TCIF_TEXT;
 
-			item.pszText = "x86";
-			TabCtrl_InsertItem(hWndTabArch, 0, &item);
-			item.pszText = "x64";
-			TabCtrl_InsertItem(hWndTabArch, 2, &item);
-
+			item.mask = TCIF_TEXT | TCIF_PARAM;
 			item.pszText = "VCM";
+			item.lParam = IDC_INTERFACE_OFFSET_VCM;
 			TabCtrl_InsertItem(hWndTabInterface, 0, &item);
 			item.pszText = "DMO";
+			item.lParam = IDC_INTERFACE_OFFSET_DMO;
 			TabCtrl_InsertItem(hWndTabInterface, 1, &item);
 			item.pszText = "DirectShow";
+			item.lParam = IDC_INTERFACE_OFFSET_DSF;
 			TabCtrl_InsertItem(hWndTabInterface, 2, &item);
+
+			item.mask = TCIF_TEXT | TCIF_PARAM;
+			for (int i = 0; archinfo[i] != NULL; i++)
+			{
+				char buf[sizeof(archinfo[i]->szName)];
+				LVCOLUMN col;
+				HWND hWndListView;
+
+				strcpy(buf, archinfo[i]->szName);
+				item.pszText = buf;
+				item.lParam  = archinfo[i]->uIDBase;
+				TabCtrl_InsertItem(hWndTabArch, i, &item);
+
+				memset(&col, 0, sizeof(col));
+				col.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+
+				hWndListView = CreateWindow(WC_LISTVIEW, "",
+					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_VCM), NULL, NULL);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 400;
+				col.pszText = "Name";
+				col.iSubItem = 0;
+				ListView_InsertColumn(hWndListView, 0, &col);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 100;
+				col.pszText = "FourCC";
+				col.iSubItem = 1;
+				ListView_InsertColumn(hWndListView, 1, &col);
+
+				hWndListView = CreateWindow(WC_LISTVIEW, "",
+					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DMO), NULL, NULL);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 400;
+				col.pszText = "Name";
+				col.iSubItem = 0;
+				ListView_InsertColumn(hWndListView, 0, &col);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 200;
+				col.pszText = "CLSID";
+				col.iSubItem = 1;
+				ListView_InsertColumn(hWndListView, 1, &col);
+
+				hWndListView = CreateWindow(WC_LISTVIEW, "",
+					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DSF), NULL, NULL);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 400;
+				col.pszText = "Name";
+				col.iSubItem = 0;
+				ListView_InsertColumn(hWndListView, 0, &col);
+
+				col.fmt = LVCFMT_LEFT;
+				col.cx = 400;
+				col.pszText = "DisplayName";
+				col.iSubItem = 1;
+				ListView_InsertColumn(hWndListView, 1, &col);
+			}
+			BringWindowToTop(GetDlgItem(hWnd, archinfo[0]->uIDBase));
 		}
 		return 0;
 	case WM_SIZE:
@@ -100,6 +190,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TabCtrl_AdjustRect(hWndTabArch, FALSE, &rc);
 			MoveWindow(hWndTabInterface, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 			TabCtrl_AdjustRect(hWndTabInterface, FALSE, &rc);
+			for (int i = 0; archinfo[i] != NULL; i++)
+			{
+				for (int j = 0; j < IDC_INTERFACE_OFFSET_END; j++)
+					MoveWindow(GetDlgItem(hWnd, archinfo[i]->uIDBase + j), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+			}
+		}
+		return 0;
+	case WM_NOTIFY:
+		switch (((LPNMHDR)lParam)->code)
+		{
+		case TCN_SELCHANGE:
+			{
+				TCITEM item;
+				UINT uID;
+				TabCtrl_GetItem(hWndTabArch, TabCtrl_GetCurSel(hWndTabArch), &item);
+				uID = item.lParam;
+				TabCtrl_GetItem(hWndTabInterface, TabCtrl_GetCurSel(hWndTabInterface), &item);
+				uID += item.lParam;
+				BringWindowToTop(GetDlgItem(hWnd, uID));
+			}
+			return TRUE;
 		}
 		return 0;
 	case WM_DESTROY:
