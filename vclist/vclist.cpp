@@ -207,6 +207,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				TCITEM item;
 				UINT uID;
+
+				memset(&item, 0, sizeof(item));
+				item.mask = TCIF_PARAM;
 				TabCtrl_GetItem(hWndTabArch, TabCtrl_GetCurSel(hWndTabArch), &item);
 				uID = item.lParam;
 				TabCtrl_GetItem(hWndTabInterface, TabCtrl_GetCurSel(hWndTabInterface), &item);
