@@ -136,7 +136,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_VCM), NULL, NULL);
 
 				col.fmt = LVCFMT_LEFT;
-				col.cx = 400;
+				col.cx = 300;
 				col.pszText = "Name";
 				col.iSubItem = 0;
 				ListView_InsertColumn(hWndListView, 0, &col);
@@ -152,13 +152,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DMO), NULL, NULL);
 
 				col.fmt = LVCFMT_LEFT;
-				col.cx = 400;
+				col.cx = 300;
 				col.pszText = "Name";
 				col.iSubItem = 0;
 				ListView_InsertColumn(hWndListView, 0, &col);
 
 				col.fmt = LVCFMT_LEFT;
-				col.cx = 200;
+				col.cx = 300;
 				col.pszText = "CLSID";
 				col.iSubItem = 1;
 				ListView_InsertColumn(hWndListView, 1, &col);
@@ -168,13 +168,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DSF), NULL, NULL);
 
 				col.fmt = LVCFMT_LEFT;
-				col.cx = 400;
+				col.cx = 300;
 				col.pszText = "Name";
 				col.iSubItem = 0;
 				ListView_InsertColumn(hWndListView, 0, &col);
 
 				col.fmt = LVCFMT_LEFT;
-				col.cx = 400;
+				col.cx = 700;
 				col.pszText = "DisplayName";
 				col.iSubItem = 1;
 				ListView_InsertColumn(hWndListView, 1, &col);
