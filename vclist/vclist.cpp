@@ -255,14 +255,44 @@ void _cdecl DoRefresh(void *lpvParam)
 
 		if (CreateProcess(szAppName, "", NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 		{
-			char buf[2000];
+			char buf[2048];
 			FILE *fp;
 
 			CloseHandle(hStdOut);
-			Sleep(1000);
 			fp = _fdopen( _open_osfhandle((intptr_t)hStdOutParentSide, _O_RDONLY), "rt");
-			fgets(buf, 2000, fp);
-			MessageBox(hWnd, buf, "VCLIST", 0);
+
+			while (fgets(buf, 2000, fp) != NULL)
+			{
+				LVITEM item;
+				UINT uID;
+				HWND hWndListView;
+				char *p;
+
+				uID = archinfo[i]->uIDBase;
+				p = strchr(buf, '\t');
+				*p++ = '\0';
+				if (strcmp(buf, "VCM") == 0)
+					uID += IDC_INTERFACE_OFFSET_VCM;
+				else if (strcmp(buf, "DMO") == 0)
+					uID += IDC_INTERFACE_OFFSET_DMO;
+				else if (strcmp(buf, "DSF") == 0)
+					uID += IDC_INTERFACE_OFFSET_DSF;
+				else
+					continue;
+
+				hWndListView = GetDlgItem(hWnd, uID);
+				memset(&item, 0, sizeof(item));
+				item.mask = LVIF_TEXT;
+				item.iItem = ListView_GetItemCount(hWndListView);
+				item.pszText = p;
+				p = strchr(p, '\t');
+				*p++ = '\0';
+				ListView_InsertItem(hWndListView, &item);
+
+				item.iSubItem = 1;
+				item.pszText = p;
+				ListView_SetItem(hWndListView, &item);
+			}
 
 			fclose(fp);
 			CloseHandle(pi.hThread);
@@ -270,9 +300,13 @@ void _cdecl DoRefresh(void *lpvParam)
 		}
 		else
 		{
+			char buf[256];
+
 			CloseHandle(hStdOut);
 			CloseHandle(hStdOutParentSide);
-			MessageBox(hWnd, "hoge", "fuga", MB_ERROR);
+
+			sprintf(buf, "Cannot execute enumerator program %s", szAppName);
+			MessageBox(hWnd, buf, szTitle, MB_ICONERROR);
 		}
 	}
 }
