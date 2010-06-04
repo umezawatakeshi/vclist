@@ -33,13 +33,10 @@
 
 // C ランタイム ヘッダー ファイル
 #include <stdio.h>
-#include <fcntl.h>
-#include <io.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
-#include <process.h>
 
 
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください。

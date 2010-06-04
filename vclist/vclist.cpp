@@ -24,6 +24,7 @@ const ARCHINFO arch_x64 = { "x64", IDC_ARCHITECTURE_BASE_X64 };
 const ARCHINFO *archinfo[3];
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void Refresh(HWND hWnd);
 
 HWND hWndMain;
 HWND hWndTabArch;;
@@ -179,6 +180,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ListView_InsertColumn(hWndListView, 1, &col);
 			}
 			BringWindowToTop(GetDlgItem(hWnd, archinfo[0]->uIDBase));
+
+			Refresh(hWnd);
 		}
 		return 0;
 	case WM_SIZE:
@@ -219,4 +222,62 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void _cdecl DoRefresh(void *lpvParam)
+{
+	HWND hWnd = (HWND)lpvParam;
+	char szAppDir[256];
+
+	GetModuleFileName(NULL, szAppDir, _countof(szAppDir));
+	*strrchr(szAppDir, '\\') = '\0';
+
+	for (int i = 0; archinfo[i] != NULL; i++)
+	{
+		char szAppName[256];
+		HANDLE hStdOut, hStdOutParentSide;
+		SECURITY_ATTRIBUTES sa;
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		for (int j = 0; j < IDC_INTERFACE_OFFSET_END; j++)
+			ListView_DeleteAllItems(GetDlgItem(hWnd, archinfo[i]->uIDBase + j));
+		wsprintf(szAppName, "%s\\vclist-enum-%s.exe", szAppDir, archinfo[i]->szName);
+
+		memset(&sa, 0, sizeof(sa));
+		sa.nLength = sizeof(sa);
+		sa.bInheritHandle = TRUE;
+		CreatePipe(&hStdOutParentSide, &hStdOut, &sa, 0);
+		memset(&si, 0, sizeof(si));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESTDHANDLES;
+		si.hStdOutput = hStdOut;
+
+		if (CreateProcess(szAppName, "", NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+		{
+			char buf[2000];
+			FILE *fp;
+
+			CloseHandle(hStdOut);
+			Sleep(1000);
+			fp = _fdopen( _open_osfhandle((intptr_t)hStdOutParentSide, _O_RDONLY), "rt");
+			fgets(buf, 2000, fp);
+			MessageBox(hWnd, buf, "VCLIST", 0);
+
+			fclose(fp);
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+		}
+		else
+		{
+			CloseHandle(hStdOut);
+			CloseHandle(hStdOutParentSide);
+			MessageBox(hWnd, "hoge", "fuga", MB_ERROR);
+		}
+	}
+}
+
+void Refresh(HWND hWnd)
+{
+	_beginthread(DoRefresh, 0, (LPVOID)hWnd);
 }
