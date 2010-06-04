@@ -305,7 +305,7 @@ void _cdecl DoRefresh(void *lpvParam)
 			CloseHandle(hStdOut);
 			CloseHandle(hStdOutParentSide);
 
-			sprintf(buf, "Cannot execute enumerator program %s", szAppName);
+			sprintf(buf, "Cannot execute enumerator program:\n%s", szAppName);
 			MessageBox(hWnd, buf, szTitle, MB_ICONERROR);
 		}
 	}
