@@ -134,6 +134,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				hWndListView = CreateWindow(WC_LISTVIEW, "",
 					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_VCM), NULL, NULL);
+				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
 				col.fmt = LVCFMT_LEFT;
 				col.cx = 300;
@@ -150,6 +151,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				hWndListView = CreateWindow(WC_LISTVIEW, "",
 					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DMO), NULL, NULL);
+				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
 				col.fmt = LVCFMT_LEFT;
 				col.cx = 300;
@@ -166,6 +168,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				hWndListView = CreateWindow(WC_LISTVIEW, "",
 					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
 					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DSF), NULL, NULL);
+				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
 				col.fmt = LVCFMT_LEFT;
 				col.cx = 300;
