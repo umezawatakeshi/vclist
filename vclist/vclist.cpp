@@ -10,6 +10,7 @@
 #include "resource.h"
 
 const char szTitle[] = "Video Codec List";
+const char szVersion[] = "1.0.0";
 const char szWindowClass[] = "VCLIST";
 
 struct ARCHINFO
@@ -68,7 +69,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	wcex.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
 	wcex.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName  = NULL;
+	wcex.lpszMenuName  = MAKEINTRESOURCE(IDR_VCLIST);
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&wcex);
@@ -78,7 +79,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	ShowWindow(hWndMain, nCmdShow);
 	UpdateWindow(hWndMain);
 
-	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_VCLIST));
+	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_VCLIST));
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -208,6 +209,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for (int j = 0; j < IDC_INTERFACE_OFFSET_END; j++)
 					MoveWindow(GetDlgItem(hWnd, archinfo[i]->uIDBase + j), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 			}
+		}
+		return 0;
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILE_EXIT:
+			SendMessage(hWnd, WM_CLOSE, 0, 0);
+			return 0;
+		case ID_VIEW_REFRESH:
+			Refresh(hWnd);
+			return 0;
+		case ID_HELP_ABOUT:
+			{
+				char buf[256];
+				wsprintf(buf,
+					"%s, version %s\n"
+					"Copyright (C) 2010  UMEZAWA Takeshi\n\n"
+					"Licensed under GNU General Public License version 2 or later.",
+					szTitle, szVersion);
+				MessageBox(hWnd, buf, szTitle, 0);
+			}
+			return 0;
 		}
 		return 0;
 	case WM_NOTIFY:
