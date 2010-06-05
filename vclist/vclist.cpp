@@ -35,9 +35,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	WNDCLASSEX wcex;
 	HACCEL hAccel;
 	MSG msg;
+	HMODULE hModuleKernel32;
 	SYSTEM_INFO si;
+	typedef void (WINAPI *pfn_gsi_t)(SYSTEM_INFO *);
+	pfn_gsi_t gsi;
 
-	GetNativeSystemInfo(&si);
+	hModuleKernel32 = LoadLibrary("KERNEL32.DLL");
+	gsi = (pfn_gsi_t)GetProcAddress(hModuleKernel32, "GetNativeSystemInfo");
+	if (gsi == NULL)
+		gsi = GetSystemInfo;
+	gsi(&si);
 	switch(si.wProcessorArchitecture)
 	{
 	case PROCESSOR_ARCHITECTURE_INTEL:
