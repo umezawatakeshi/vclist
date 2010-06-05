@@ -42,6 +42,8 @@ void EnumVCM(void)
 	for (int i = 0; ICInfo(ICTYPE_VIDEO, i, &info); i++)
 	{
 		HIC hic = ICOpen(ICTYPE_VIDEO, info.fccHandler, ICMODE_COMPRESS);
+		if (hic == NULL)
+			continue;
 		ICGetInfo(hic, &info, sizeof(info));
 		ICClose(hic);
 		wsprintf(buf, "VCM\t%S\t%c%c%c%c\n", info.szDescription, FCC4PRINTF(info.fccHandler));
