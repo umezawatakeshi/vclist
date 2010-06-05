@@ -281,6 +281,8 @@ void _cdecl DoRefresh(void *lpvParam)
 				HWND hWndListView;
 				char *p;
 
+				strtok(buf, "\r\n"); // 末尾の改行文字を削除する簡単な方法。
+
 				uID = archinfo[i]->uIDBase;
 				p = strchr(buf, '\t');
 				*p++ = '\0';
