@@ -24,6 +24,7 @@ void EnumDSF(void);
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	setvbuf(stdout, NULL, _IONBF, 0);
 
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
