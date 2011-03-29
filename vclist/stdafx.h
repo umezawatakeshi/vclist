@@ -27,6 +27,9 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
+
+#define _CRT_SECURE_NO_WARNINGS
+
 // Windows ヘッダー ファイル:
 #include <windows.h>
 #include <commctrl.h>
