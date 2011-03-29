@@ -21,7 +21,7 @@ GNU General Public License for more details.</p>
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="overview">Overview</h2>
-<p>Video Codec List is a Windows tool to enumerate and list video codec. It can list VCM codecs, DMO codecs and DirectShow native codecs. In x64 Windows, it can also list x64 version codecs.</p>
+<p>Video Codec List is a Windows tool to enumerate and list video codec. It can list VCM codecs, DMO codecs and DirectShow native codecs. In x64 Windows, it can also list x64 version codecs. (Note that DirectShow decoder is not enumerated, because "decoder category" does not exist in DirectShow.)</p>
 <h2 id="environment">Environment</h2>
 <h3>Minimum requirement</h3>
 <dl>
@@ -42,6 +42,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dd>AMD CodeAnalyst for Windows v3.1</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 1.1.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Decoders are also enumerated.</li>
+</ul></dd>
+</dl>
 <h3>Version 1.0.0</h3>
 <p>First public release</p>
 <hr>
