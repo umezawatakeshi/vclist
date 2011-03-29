@@ -28,7 +28,8 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void Refresh(HWND hWnd);
 
 HWND hWndMain;
-HWND hWndTabArch;;
+HWND hWndTabArch;
+HWND hWndTabType;
 HWND hWndTabInterface;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -104,11 +105,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hWndTabInterface = CreateWindow(WC_TABCONTROL, "",
 				WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0, 0, 1, 1,
 				hWnd, (HMENU)-1, NULL, NULL); 
+			hWndTabType = CreateWindow(WC_TABCONTROL, "",
+				WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0, 0, 1, 1,
+				hWnd, (HMENU)-1, NULL, NULL); 
 			hWndTabArch = CreateWindow(WC_TABCONTROL, "",
 				WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE, 0, 0, 1, 1,
 				hWnd, (HMENU)-1, NULL, NULL); 
 
 			SendMessage(hWndTabInterface, WM_SETFONT, (WPARAM) GetStockObject(ANSI_VAR_FONT), TRUE);
+			SendMessage(hWndTabType, WM_SETFONT, (WPARAM) GetStockObject(ANSI_VAR_FONT), TRUE);
 			SendMessage(hWndTabArch, WM_SETFONT, (WPARAM) GetStockObject(ANSI_VAR_FONT), TRUE);
 
 			memset(&item, 0, sizeof(item));
@@ -125,6 +130,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			TabCtrl_InsertItem(hWndTabInterface, 2, &item);
 
 			item.mask = TCIF_TEXT | TCIF_PARAM;
+			item.pszText = "Encoder";
+			item.lParam = IDC_TYPE_OFFSET_ENCODER;
+			TabCtrl_InsertItem(hWndTabType, 0, &item);
+			item.pszText = "Decoder";
+			item.lParam = IDC_TYPE_OFFSET_DECODER;
+			TabCtrl_InsertItem(hWndTabType, 1, &item);
+
+			item.mask = TCIF_TEXT | TCIF_PARAM;
 			for (int i = 0; archinfo[i] != NULL; i++)
 			{
 				char buf[sizeof(archinfo[i]->szName)];
@@ -139,56 +152,59 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				memset(&col, 0, sizeof(col));
 				col.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 
-				hWndListView = CreateWindow(WC_LISTVIEW, "",
-					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
-					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_VCM), NULL, NULL);
-				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
+				for (UINT uIDType = 0; uIDType < IDC_TYPE_OFFSET_END; uIDType += IDC_TYPE_OFFSET_STEP)
+				{
+					hWndListView = CreateWindow(WC_LISTVIEW, "",
+						WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+						hWnd, (HMENU)(archinfo[i]->uIDBase + uIDType + IDC_INTERFACE_OFFSET_VCM), NULL, NULL);
+					ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 300;
-				col.pszText = "Name";
-				col.iSubItem = 0;
-				ListView_InsertColumn(hWndListView, 0, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 300;
+					col.pszText = "Name";
+					col.iSubItem = 0;
+					ListView_InsertColumn(hWndListView, 0, &col);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 100;
-				col.pszText = "FourCC";
-				col.iSubItem = 1;
-				ListView_InsertColumn(hWndListView, 1, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 100;
+					col.pszText = "FourCC";
+					col.iSubItem = 1;
+					ListView_InsertColumn(hWndListView, 1, &col);
 
-				hWndListView = CreateWindow(WC_LISTVIEW, "",
-					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
-					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DMO), NULL, NULL);
-				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
+					hWndListView = CreateWindow(WC_LISTVIEW, "",
+						WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+						hWnd, (HMENU)(archinfo[i]->uIDBase + uIDType + IDC_INTERFACE_OFFSET_DMO), NULL, NULL);
+					ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 300;
-				col.pszText = "Name";
-				col.iSubItem = 0;
-				ListView_InsertColumn(hWndListView, 0, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 300;
+					col.pszText = "Name";
+					col.iSubItem = 0;
+					ListView_InsertColumn(hWndListView, 0, &col);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 300;
-				col.pszText = "CLSID";
-				col.iSubItem = 1;
-				ListView_InsertColumn(hWndListView, 1, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 300;
+					col.pszText = "CLSID";
+					col.iSubItem = 1;
+					ListView_InsertColumn(hWndListView, 1, &col);
 
-				hWndListView = CreateWindow(WC_LISTVIEW, "",
-					WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
-					hWnd, (HMENU)(archinfo[i]->uIDBase + IDC_INTERFACE_OFFSET_DSF), NULL, NULL);
-				ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
+					hWndListView = CreateWindow(WC_LISTVIEW, "",
+						WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+						hWnd, (HMENU)(archinfo[i]->uIDBase + uIDType + IDC_INTERFACE_OFFSET_DSF), NULL, NULL);
+					ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 300;
-				col.pszText = "Name";
-				col.iSubItem = 0;
-				ListView_InsertColumn(hWndListView, 0, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 300;
+					col.pszText = "Name";
+					col.iSubItem = 0;
+					ListView_InsertColumn(hWndListView, 0, &col);
 
-				col.fmt = LVCFMT_LEFT;
-				col.cx = 700;
-				col.pszText = "DisplayName";
-				col.iSubItem = 1;
-				ListView_InsertColumn(hWndListView, 1, &col);
+					col.fmt = LVCFMT_LEFT;
+					col.cx = 700;
+					col.pszText = "DisplayName";
+					col.iSubItem = 1;
+					ListView_InsertColumn(hWndListView, 1, &col);
+				}
 			}
 			BringWindowToTop(GetDlgItem(hWnd, archinfo[0]->uIDBase));
 
@@ -202,12 +218,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetRect(&rc, 0, 0, LOWORD(lParam), HIWORD(lParam));
 			MoveWindow(hWndTabArch, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 			TabCtrl_AdjustRect(hWndTabArch, FALSE, &rc);
+			MoveWindow(hWndTabType, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+			TabCtrl_AdjustRect(hWndTabType, FALSE, &rc);
 			MoveWindow(hWndTabInterface, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 			TabCtrl_AdjustRect(hWndTabInterface, FALSE, &rc);
 			for (int i = 0; archinfo[i] != NULL; i++)
 			{
 				for (int j = 0; j < IDC_INTERFACE_OFFSET_END; j++)
-					MoveWindow(GetDlgItem(hWnd, archinfo[i]->uIDBase + j), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+					for (int k = 0; k < IDC_TYPE_OFFSET_END; k += IDC_TYPE_OFFSET_STEP)
+						MoveWindow(GetDlgItem(hWnd, archinfo[i]->uIDBase + k + j), rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 			}
 		}
 		return 0;
@@ -245,6 +264,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				item.mask = TCIF_PARAM;
 				TabCtrl_GetItem(hWndTabArch, TabCtrl_GetCurSel(hWndTabArch), &item);
 				uID = item.lParam;
+				TabCtrl_GetItem(hWndTabType, TabCtrl_GetCurSel(hWndTabType), &item);
+				uID += item.lParam;
 				TabCtrl_GetItem(hWndTabInterface, TabCtrl_GetCurSel(hWndTabInterface), &item);
 				uID += item.lParam;
 				BringWindowToTop(GetDlgItem(hWnd, uID));
@@ -277,7 +298,8 @@ void _cdecl DoRefresh(void *lpvParam)
 		PROCESS_INFORMATION pi;
 
 		for (int j = 0; j < IDC_INTERFACE_OFFSET_END; j++)
-			ListView_DeleteAllItems(GetDlgItem(hWnd, archinfo[i]->uIDBase + j));
+			for (int k = 0; k < IDC_TYPE_OFFSET_END; k += IDC_TYPE_OFFSET_STEP)
+				ListView_DeleteAllItems(GetDlgItem(hWnd, archinfo[i]->uIDBase + k + j));
 		wsprintf(szAppName, "%s\\vclist-enum-%s.exe", szAppDir, archinfo[i]->szName);
 
 		memset(&sa, 0, sizeof(sa));
@@ -302,33 +324,46 @@ void _cdecl DoRefresh(void *lpvParam)
 				LVITEM item;
 				UINT uID;
 				HWND hWndListView;
-				char *p;
+				char *iface;
+				char *type;
+				char *name;
+				char *aux;
 
 				strtok(buf, "\r\n"); // 末尾の改行文字を削除する簡単な方法。
+				iface = buf;
 
 				uID = archinfo[i]->uIDBase;
-				p = strchr(buf, '\t');
-				*p++ = '\0';
-				if (strcmp(buf, "VCM") == 0)
+
+				type = strchr(iface, '\t');
+				*type++ = '\0';
+				name = strchr(type, '\t');
+				*name++ = '\0';
+				aux = strchr(name, '\t');
+				*aux++ = '\0';
+
+				if (strcmp(iface, "VCM") == 0)
 					uID += IDC_INTERFACE_OFFSET_VCM;
-				else if (strcmp(buf, "DMO") == 0)
+				else if (strcmp(iface, "DMO") == 0)
 					uID += IDC_INTERFACE_OFFSET_DMO;
-				else if (strcmp(buf, "DSF") == 0)
+				else if (strcmp(iface, "DSF") == 0)
 					uID += IDC_INTERFACE_OFFSET_DSF;
 				else
 					continue;
+
+				if (strcmp(type, "1") == 0)
+					uID += IDC_TYPE_OFFSET_ENCODER;
+				else
+					uID += IDC_TYPE_OFFSET_DECODER;
 
 				hWndListView = GetDlgItem(hWnd, uID);
 				memset(&item, 0, sizeof(item));
 				item.mask = LVIF_TEXT;
 				item.iItem = ListView_GetItemCount(hWndListView);
-				item.pszText = p;
-				p = strchr(p, '\t');
-				*p++ = '\0';
+				item.pszText = name;
 				ListView_InsertItem(hWndListView, &item);
 
 				item.iSubItem = 1;
-				item.pszText = p;
+				item.pszText = aux;
 				ListView_SetItem(hWndListView, &item);
 			}
 

@@ -12,8 +12,8 @@
 	(BYTE)(fcc >> 16), \
 	(BYTE)(fcc >> 24)
 
-void EnumVCM(void);
-void EnumDMO(void);
+void EnumVCM(bool bEnc);
+void EnumDMO(bool bEnc);
 void EnumDSF(void);
 
 /*
@@ -28,31 +28,33 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-	EnumVCM();
-	EnumDMO();
+	EnumVCM(1);
+	EnumVCM(0);
+	EnumDMO(1);
+	EnumDMO(0);
 	EnumDSF();
 
 	return 0;
 }
 
-void EnumVCM(void)
+void EnumVCM(bool bEnc)
 {
 	ICINFO info;
 	char buf[256];
 
 	for (int i = 0; ICInfo(ICTYPE_VIDEO, i, &info); i++)
 	{
-		HIC hic = ICOpen(ICTYPE_VIDEO, info.fccHandler, ICMODE_COMPRESS);
+		HIC hic = ICOpen(ICTYPE_VIDEO, info.fccHandler, bEnc ? ICMODE_COMPRESS : ICMODE_DECOMPRESS);
 		if (hic == NULL)
 			continue;
 		ICGetInfo(hic, &info, sizeof(info));
 		ICClose(hic);
-		wsprintf(buf, "VCM\t%S\t%c%c%c%c\n", info.szDescription, FCC4PRINTF(info.fccHandler));
+		wsprintf(buf, "VCM\t%d\t%S\t%c%c%c%c\n", bEnc, info.szDescription, FCC4PRINTF(info.fccHandler));
 		printf("%s", buf);
 	}
 }
 
-void EnumDMO(void)
+void EnumDMO(bool bEnc)
 {
 	char buf[256];
 	WCHAR wbuf[256];
@@ -61,11 +63,11 @@ void EnumDMO(void)
 	CLSID clsid;
 	DWORD dwCount;
 
-	DMOEnum(DMOCATEGORY_VIDEO_ENCODER, DMO_ENUMF_INCLUDE_KEYED, 0, NULL, 0, NULL, &pEnumDMO);
+	DMOEnum(bEnc ? DMOCATEGORY_VIDEO_ENCODER : DMOCATEGORY_VIDEO_DECODER, DMO_ENUMF_INCLUDE_KEYED, 0, NULL, 0, NULL, &pEnumDMO);
 	while (pEnumDMO->Next(1, &clsid, &pwsz, &dwCount) == S_OK)
 	{
 		StringFromGUID2(clsid, wbuf, _countof(wbuf));
-		wsprintf(buf, "DMO\t%S\t%S\n", pwsz, wbuf);
+		wsprintf(buf, "DMO\t%d\t%S\t%S\n", bEnc, pwsz, wbuf);
 		printf("%s", buf);
 		CoTaskMemFree(pwsz);
 	}
@@ -100,7 +102,7 @@ void EnumDSF(void)
 		varFriendlyName.vt = VT_BSTR;
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void **)&pPropertyBag);
 		pPropertyBag->Read(L"FriendlyName", &varFriendlyName, 0);
-		wsprintf(buf, "DSF\t%S\t%S\n", varFriendlyName.bstrVal, pwszDisplayName);
+		wsprintf(buf, "DSF\t1\t%S\t%S\n", varFriendlyName.bstrVal, pwszDisplayName);
 		printf("%s", buf);
 		VariantClear(&varFriendlyName);
 		CoTaskMemFree(pwszDisplayName);
