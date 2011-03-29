@@ -6,6 +6,8 @@
 
 #include "stdafx.h"
 
+#pragma warning(disable : 4995)
+
 #define FCC4PRINTF(fcc) \
 	(BYTE)(fcc), \
 	(BYTE)(fcc >> 8), \
