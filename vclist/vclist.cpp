@@ -263,11 +263,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				memset(&item, 0, sizeof(item));
 				item.mask = TCIF_PARAM;
 				TabCtrl_GetItem(hWndTabArch, TabCtrl_GetCurSel(hWndTabArch), &item);
-				uID = item.lParam;
+				uID = (UINT)item.lParam;
 				TabCtrl_GetItem(hWndTabType, TabCtrl_GetCurSel(hWndTabType), &item);
-				uID += item.lParam;
+				uID += (UINT)item.lParam;
 				TabCtrl_GetItem(hWndTabInterface, TabCtrl_GetCurSel(hWndTabInterface), &item);
-				uID += item.lParam;
+				uID += (UINT)item.lParam;
 				BringWindowToTop(GetDlgItem(hWnd, uID));
 			}
 			return TRUE;
