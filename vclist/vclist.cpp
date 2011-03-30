@@ -41,6 +41,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	SYSTEM_INFO si;
 	typedef void (WINAPI *pfn_gsi_t)(SYSTEM_INFO *);
 	pfn_gsi_t gsi;
+	INITCOMMONCONTROLSEX iccex;
+
+	iccex.dwSize = sizeof(iccex);
+	iccex.dwICC = ICC_WIN95_CLASSES;
+	InitCommonControlsEx(&iccex);
 
 	hModuleKernel32 = LoadLibrary("KERNEL32.DLL");
 	gsi = (pfn_gsi_t)GetProcAddress(hModuleKernel32, "GetNativeSystemInfo");
