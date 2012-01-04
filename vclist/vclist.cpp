@@ -249,7 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				char buf[256];
 				wsprintf(buf,
 					"%s, version %s\n"
-					"Copyright (C) 2010-2011  UMEZAWA Takeshi\n\n"
+					"Copyright (C) 2010-2012  UMEZAWA Takeshi\n\n"
 					"Licensed under GNU General Public License version 2 or later.",
 					szTitle, szVersion);
 				MessageBox(hWnd, buf, szTitle, 0);
