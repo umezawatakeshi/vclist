@@ -133,6 +133,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			item.pszText = "DirectShow";
 			item.lParam = IDC_INTERFACE_OFFSET_DSF;
 			TabCtrl_InsertItem(hWndTabInterface, 2, &item);
+			if (LOBYTE(LOWORD(GetVersion())) >= 6 /* Windows Vista */)
+			{
+				item.pszText = "Media Foundation";
+				item.lParam = IDC_INTERFACE_OFFSET_MFT;
+				TabCtrl_InsertItem(hWndTabInterface, 3, &item);
+			}
 
 			item.mask = TCIF_TEXT | TCIF_PARAM;
 			item.pszText = "Encoder";
@@ -209,6 +215,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					col.pszText = "DisplayName";
 					col.iSubItem = 1;
 					ListView_InsertColumn(hWndListView, 1, &col);
+
+					if (LOBYTE(LOWORD(GetVersion())) >= 6 /* Windows Vista */)
+					{
+						hWndListView = CreateWindow(WC_LISTVIEW, "",
+							WS_CHILD | LVS_REPORT | WS_VISIBLE | WS_CLIPSIBLINGS, 0, 0, 1, 1,
+							hWnd, (HMENU)(archinfo[i]->uIDBase + uIDType + IDC_INTERFACE_OFFSET_MFT), NULL, NULL);
+						ListView_SetExtendedListViewStyle(hWndListView, LVS_EX_FULLROWSELECT);
+
+						col.fmt = LVCFMT_LEFT;
+						col.cx = 300;
+						col.pszText = "Name";
+						col.iSubItem = 0;
+						ListView_InsertColumn(hWndListView, 0, &col);
+
+						col.fmt = LVCFMT_LEFT;
+						col.cx = 300;
+						col.pszText = "CLSID";
+						col.iSubItem = 1;
+						ListView_InsertColumn(hWndListView, 1, &col);
+					}
 				}
 			}
 			BringWindowToTop(GetDlgItem(hWnd, archinfo[0]->uIDBase));
@@ -352,6 +378,8 @@ void _cdecl DoRefresh(void *lpvParam)
 					uID += IDC_INTERFACE_OFFSET_DMO;
 				else if (strcmp(iface, "DSF") == 0)
 					uID += IDC_INTERFACE_OFFSET_DSF;
+				else if (strcmp(iface, "MFT") == 0)
+					uID += IDC_INTERFACE_OFFSET_MFT;
 				else
 					continue;
 

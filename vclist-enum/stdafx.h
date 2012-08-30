@@ -34,6 +34,7 @@
 #include <vfw.h>
 #include <dmo.h>
 #include <dshow.h>
+#include <mfapi.h>
 
 // C ランタイム ヘッダー ファイル
 #include <stdio.h>
