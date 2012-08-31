@@ -10,7 +10,7 @@
 #include "resource.h"
 
 const char szTitle[] = "Video Codec List";
-const char szVersion[] = "1.1.1";
+const char szVersion[] = "1.2.0";
 const char szWindowClass[] = "VCLIST";
 
 struct ARCHINFO
